@@ -128,6 +128,7 @@ class FileServerHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         """Handle file uploads."""
         content_type = self.headers.get("Content-Type")
+        # "multipart/form-data" is used to get any type of files. It is more complicated compared to other formats.
         if not content_type or "multipart/form-data" not in content_type:
             self.send_response(400)
             self.end_headers()
@@ -135,7 +136,9 @@ class FileServerHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         _, params = cgi.parse_header(content_type)
+        # The boundaries is specified according to html format that we've chosen. (Currently multipart/form-data)
         boundary = params["boundary"].encode()
+        # We need the length to have acknowledge about how much bytes that we are going to upload.
         content_length = int(self.headers["Content-Length"])
         data = self.rfile.read(content_length)
 
